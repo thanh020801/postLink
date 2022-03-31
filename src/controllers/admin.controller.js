@@ -12,6 +12,7 @@ const adminController = {
 		const newProduct = Product({
 			name: req.body.name,
 			price: req.body.price,
+			discount: req.body.discount,
 			brain: req.body.brain,
 			kind: req.body.kind,
 			origin: req.body.origin,

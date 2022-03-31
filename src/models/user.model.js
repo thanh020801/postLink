@@ -21,14 +21,17 @@ const userSchema = mongoose.Schema({
 		type: Boolean,
 		default: false,
 	},
+	// Tài khoản bị khóa
 	block: {
 		type: Boolean,
 		default: false,
 	},
+	// Danh sách hàng trong giỏ chưa mua
 	cart: {
 		type: Array,
 		default: []
 	},
+	// Danh sách hàng đã mua
 	bought: {
 		type: Array,
 		default: []

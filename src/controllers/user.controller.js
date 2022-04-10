@@ -36,16 +36,21 @@ const userController = {
 	// Tạo tài khoản
 	register: async(req,res)=>{
 		const hashed = await sha256(config.salt + req.body.password + config.salt)
-		const newUser = User({
-			name: req.body.name,
-			username: req.body.username,
-			password: hashed,
-		})
-		const user = await newUser.save()
-		if(!user){
-			return res.status(404).json("Đăng ký không thành công")
+		const uniqueUser = await User.findOne({username: req.body.username})
+		if(uniqueUser){
+			return res.status(300).json("Tài khoản này đã tồn tại")
+		}else{
+			const newUser = User({
+				username: req.body.username,
+				password: hashed,
+			})
+			const user = await newUser.save()
+			if(!user){
+				return res.status(404).json("Đăng ký không thành công")
+			}
+			return res.status(200).json(user)			
 		}
-		return res.status(200).json(user)
+
 	},
 
 	// Đăng nhập
@@ -63,6 +68,7 @@ const userController = {
 			if(user && isValidPassword){
 				const acceptToken = userController.generateAcceptToken(user)
 				const refreshToken = userController.generateRefreshToken(user)
+				// localStorage.setItem('refreshToken', JSON.stringify(refreshToken))
 				res.cookie("refreshToken", refreshToken,{
 					httpOnly: true,
 					secure:false,
@@ -70,7 +76,7 @@ const userController = {
 					sameSite: 'strict',
 				})
 				const {password, ...others} = user._doc
-				return res.status(200).json({...others,acceptToken})
+				return res.status(200).json({...others,acceptToken,refreshToken})
 			}			
 		}catch(err){
 			return res.status(500).json(err)

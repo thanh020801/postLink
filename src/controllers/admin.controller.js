@@ -21,6 +21,7 @@ const adminController = {
 			size: req.body.size,
 			state: req.body.state,
 			quantity: req.body.quantity,
+			image: req.body.image,
 		})
 		const product = await newProduct.save()
 		if(!product){
@@ -42,11 +43,19 @@ const adminController = {
 
 	// Xóa sản phẩm
 	deleteProduct: async(req,res)=>{
-		const product = await Product.findByIdAndDelete(req.params.id)
-		if(!product){
-			res.status(403).json("Không có quyền xóa")
+		console.log(req.params.id)
+		try{
+			const product = await Product.findByIdAndDelete(req.params.id)
+			if(!product){
+				return res.status(403).json("Không có sản phẩm")
+			}		
+			return res.status(200).text("Delete Successfully")	
+		}catch(err){
+			console.log("Xóa nè mà ko đc")
+			res.status(500).json(err)
 		}
-		res.status(200).json("Delete Successfully")
+
+		
 	},
 
 	// Xem danh sách user

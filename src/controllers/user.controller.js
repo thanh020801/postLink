@@ -13,7 +13,8 @@ const userController = {
 		return JWT.sign(
 			{
 				id: user.id,
-				admin: user.admin
+				// username : user.username,
+				admin: user.admin,
 			},
 			process.env.JWT_ACCEPT_KEY,
 			{
@@ -25,7 +26,8 @@ const userController = {
 		return JWT.sign(
 			{
 				id: user.id,
-				admin: user.admin
+				// username : user.username,
+				admin: user.admin,
 			},
 			process.env.JWT_ACCEPT_KEY,
 			{
@@ -83,6 +85,8 @@ const userController = {
 		}
 
 	},
+
+
 	viewAll: async(req,res)=>{
 		const products =await Product.find()
 		if(!products){

@@ -5,7 +5,7 @@ const JWT = require('jsonwebtoken')
 const config = require('../config')
 const Product = require('../models/product.model')
 const User = require('../models/user.model')
-
+const Invoice = require('../models/invoice.model')
 
 const userController = {
 	// Accept tokent
@@ -45,6 +45,10 @@ const userController = {
 			const newUser = User({
 				username: req.body.username,
 				password: hashed,
+				firstName: req.body.firstName,
+				lastName: req.body.lastName,
+				address: req.body.address,
+				phoneNumber: req.body.phoneNumber,
 			})
 			const user = await newUser.save()
 			if(!user){
@@ -101,10 +105,79 @@ const userController = {
 		}
 		return res.status(200).json(product)
 	},
-	cart: async(req,res)=>{
-		res.send('cart')
+	addProductTocart: async(req,res)=>{
+		try{
+			// console.log(req.body)
+			const user = 
+			await User.findByIdAndUpdate(
+				req.params.id,
+				{$push:{cart: {item: req.body.item, checkBuy:true, quantityBuy: 1}}},
+				// {cart:[]},
+				{new: true})
+			if(!user){
+				return res.status(404).json("Thêm thất bại")
+			}
+			// console.log(user)
+			const {password, ...others} = user._doc
+			return res.status(200).json({...others})
+		}catch(err){
+			return res.status(500).json(err)
+		}
 	},
-
+	deleteAProductToCart: async(req,res)=>{
+		try{
+			// console.log(req.body)
+			const user = 
+			await User.findByIdAndUpdate(
+				req.params.id,
+				{$pull:{cart: {item: req.body.item}}},
+				// {cart:[]},
+				{new: true})
+			if(!user){
+				return res.status(404).json("Thêm thất bại")
+			}
+			// console.log(user)
+			const {password, ...others} = user._doc
+			return res.status(200).json({...others})
+		}catch(err){
+			return res.status(500).json(err)
+		}		
+	},
+	deleteAllProductToCart: async(req,res)=>{
+		try{
+			// console.log(req.body)
+			const user = 
+			await User.findByIdAndUpdate(
+				req.params.id,
+				{cart:[]},
+				{new: true})
+			if(!user){
+				return res.status(404).json("Thêm thất bại")
+			}
+			// console.log(user)
+			const {password, ...others} = user._doc
+			return res.status(200).json({...others})
+		}catch(err){
+			return res.status(500).json(err)
+		}		
+	},
+	buy: async(req,res)=>{
+		try{
+			const newInvoice = Invoice({
+				name: req.body.name,
+				address: req.body.address,
+				totalPrice: req.body.totalPrice,
+				listItem: req.body.listItem
+			})
+			const invoice = await newInvoice.save()
+			if(!invoice){
+				return res.status(404).json("Mua thất bại")
+			}
+			return res.status(200).json(invoice)
+		}catch(err){
+			return res.status(500).json(err)
+		}
+	}
 }
 
 module.exports = userController

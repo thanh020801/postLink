@@ -11,6 +11,10 @@ const invoiceSchema = mongoose.Schema({
 		type: String,
 		require: true,
 	},
+	phoneNumber: {
+		type: String,
+		require: true,
+	},
 	// Tổng giá tiền
 	totalPrice: {
 		type: Number,

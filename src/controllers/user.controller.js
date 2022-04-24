@@ -37,26 +37,29 @@ const userController = {
 	},
 	// Tạo tài khoản
 	register: async(req,res)=>{
-		const hashed = await sha256(config.salt + req.body.password + config.salt)
-		const uniqueUser = await User.findOne({username: req.body.username})
-		if(uniqueUser){
-			return res.status(300).json("Tài khoản này đã tồn tại")
-		}else{
-			const newUser = User({
-				username: req.body.username,
-				password: hashed,
-				firstName: req.body.firstName,
-				lastName: req.body.lastName,
-				address: req.body.address,
-				phoneNumber: req.body.phoneNumber,
-			})
-			const user = await newUser.save()
-			if(!user){
-				return res.status(404).json("Đăng ký không thành công")
-			}
-			return res.status(200).json(user)			
+		try{
+			const hashed = await sha256(config.salt + req.body.password + config.salt)
+			const uniqueUser = await User.findOne({username: req.body.username})
+			if(uniqueUser){
+				return res.status(300).json("Tài khoản này đã tồn tại")
+			}else{
+				const newUser = User({
+					username: req.body.username,
+					password: hashed,
+					firstName: req.body.firstName,
+					lastName: req.body.lastName,
+					address: req.body.address,
+					phoneNumber: req.body.phoneNumber,
+				})
+				const user = await newUser.save()
+				if(!user){
+					return res.status(404).json("Đăng ký không thành công")
+				}
+				return res.status(200).json(user)			
+			}		
+		}catch(err){
+			return res.status(500).json(err)
 		}
-
 	},
 
 	// Đăng nhập
@@ -90,21 +93,54 @@ const userController = {
 
 	},
 
-
 	viewAll: async(req,res)=>{
-		const products =await Product.find()
-		if(!products){
-			return res.status(404).json("Không tìm thấy sản phẩm nào !!!")
+		try{
+			const products =await Product.find()
+			if(!products){
+				return res.status(404).json("Không tìm thấy sản phẩm nào !!!")
+			}
+			return res.status(200).json(products)		
+		}catch(err){
+			return res.status(500).json(err)
 		}
-		return res.status(200).json(products)
 	},
+
 	viewDetail: async(req,res)=>{
-		const product = await Product.findOne({id: req.params})
-		if(!product){
-			return res.status(404).json("Sản phẩm không tồn tại !!!")
+		try{
+			const product = await Product.findOne({id: req.params})
+			if(!product){
+				return res.status(404).json("Sản phẩm không tồn tại !!!")
+			}
+			return res.status(200).json(product)			
+		}catch(err){
+			return res.status(500).json(err)
 		}
-		return res.status(200).json(product)
 	},
+
+	viewInvoice: async(req,res)=>{
+		try{
+			const invoice = await Invoice.find()
+			if(!invoice){
+				return res.status(404).json("Sản phẩm không tồn tại !!!")
+			}
+			return res.status(200).json(invoice)			
+		}catch(err){
+			return res.status(500).json(err)
+		}
+	},
+
+	viewKind: async(req,res)=>{
+		try{
+			const product = await Product.find({kind: req.body.kind})
+			if(!product){
+				return res.status(404).json("Sản phẩm không tồn tại !!!")
+			}
+			return res.status(200).json(product)
+		}catch(err){
+			return res.status(500).json(err)
+		}
+	},
+
 	addProductTocart: async(req,res)=>{
 		try{
 			// console.log(req.body)
@@ -167,7 +203,8 @@ const userController = {
 				name: req.body.name,
 				address: req.body.address,
 				totalPrice: req.body.totalPrice,
-				listItem: req.body.listItem
+				listItem: req.body.listItem,
+				phoneNumber: req.body.phoneNumber,
 			})
 			const invoice = await newInvoice.save()
 			if(!invoice){
@@ -177,7 +214,32 @@ const userController = {
 		}catch(err){
 			return res.status(500).json(err)
 		}
-	}
+	},
+	deleteInvoice: async(req,res)=>{
+		try{
+			const invoice = await Invoice.deleteMany()
+			if(!invoice){
+				return res.status(403).json("Không có sản phẩm")
+			}		
+			return res.status(200).text("Delete Successfully")	
+		}catch(err){
+			return res.status(500).json(err)
+		}
+	},
+	updateProduct: async(req,res)=>{
+		try{
+			const product = await Product.findByIdAndUpdate(
+				req.params.id,req.body,{new: true}
+			)
+			if(!product){
+				return res.status(403).json("Cập nhật không thành công")
+			}
+			return res.status(200).json(product)	
+		}catch(err){
+			return res.status(500).json(err)
+		}
+	
+	},
 }
 
 module.exports = userController

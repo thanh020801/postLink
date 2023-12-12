@@ -1,9 +1,9 @@
 const express = require('express')
 const mongoose = require('mongoose')
-const dotenv = require('dotenv')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
-
+const bodyParser = require('body-parser')
+const Document = require('./src/models/document.model')
 const config = require('./src/config')
 const Routers = require('./src/routers')
 const app = express()
@@ -14,7 +14,9 @@ const URI = config.DB.uri
 app.use(cors())
 app.use(cookieParser())
 app.use(express.json())
-
+app.use(bodyParser.urlencoded({
+	extended: true
+}));
 mongoose.connect(URI)
 	.then(()=>{
 		console.log("Database is connecting !!!")
@@ -22,6 +24,7 @@ mongoose.connect(URI)
 	.catch((err)=>{
 		console.log("err: ",err)
 	})
+
 
 Routers(app)
 // app.get("/",(req,res)=>{

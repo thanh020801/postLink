@@ -1,10 +1,6 @@
-const userRouter = require('./user.router')
-const adminRouter = require('./admin.router')
-
+const documentRouter = require('./document.router')
 
 function router(app){
-	app.use('/admin', adminRouter)
-	app.use('/', userRouter)
-	
+	app.use('/', documentRouter)
 }
 module.exports = router

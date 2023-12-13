@@ -32,13 +32,15 @@ const documentController = {
 	},
 
 
-	addDocument: async(req,res)=>{
+	addLink: async(req,res)=>{
 		try{
-			console.log('helo', req.body)
+			console.log('query', req.query.link)
+			console.log('helo', req.params.link)
 			const newDocument = Document({
-				"title": req.body.title,
-				"content": req.body.content,
-				"code": req.body.code,
+				// "title": req.body.title,
+				// "content": req.body.content,
+				// "code": req.body.code,
+				link: req.query.link
 			})
 			console.log('newDocument: ', newDocument)
 			const nDoc = await newDocument.save(newDocument)
